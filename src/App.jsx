@@ -4,14 +4,43 @@ import {
   RouterProvider,
   Route,
 } from "react-router-dom";
+import { useEffect } from "react";
+import { auth } from "./firebase";
+import { useAuth } from "./context/GlobalState";
+
 import "./App.css";
 import Header from "./components/header/Header";
+import Home from "./components/home/Home";
 import Login from "./auth/login/Login";
 function App() {
+  const { dispatch } = useAuth();
+  useEffect(() => {
+    auth.onAuthStateChanged((authUser) => {
+      if (authUser) {
+        dispatch({
+          type: "SET_USER",
+          user: authUser,
+        });
+      } else {
+        dispatch({
+          type: "SET_USER",
+          user: null,
+        });
+      }
+    });
+  }, []);
   const router = new createBrowserRouter(
     createRoutesFromElements(
       <>
-        <Route path="/" element={<Header />} />
+        <Route
+          path="/"
+          element={
+            <>
+              <Header />
+              <Home />
+            </>
+          }
+        />
         <Route path="/login" element={<Login />} />
         <Route path="*" element={<h1>Page is not found</h1>} />
       </>
